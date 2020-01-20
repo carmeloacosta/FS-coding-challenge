@@ -6,11 +6,13 @@ from json import dumps
 from django.test import TestCase
 
 from ..models import Posture, User
+from ..settings import FIXTURE_DIRS
 
 
 class ModelsTestCase(TestCase):
 
     maxDiff = None
+    fixtures = [os.path.join(FIXTURE_DIRS[0], 'initial_state.json'), ]
 
     def setUp(self):
         pass
@@ -38,9 +40,11 @@ class ModelsTestCase(TestCase):
         name = "Lotus flower"
         picture = "https://loremflickr.com/320/320/yoga,asana"
         description = "Basic yoga posture"
+        user_name="albertmiro"
+        user = User.objects.get(name=user_name)
 
         # Test main
-        new_posture = Posture(id=id, name=name, picture=picture, description=description)
+        new_posture = Posture(id=id, name=name, picture=picture, description=description, user=user)
         new_posture.save()
 
         # Check results
@@ -49,4 +53,5 @@ class ModelsTestCase(TestCase):
         self.assertEqual(pqs[0].name, name)
         self.assertEqual(pqs[0].picture, picture)
         self.assertEqual(pqs[0].description, description)
+        self.assertEqual(pqs[0].user, user)
 
