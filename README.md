@@ -4,6 +4,38 @@ Congratulations! You’re nearly there to join our team as Full Stack developer!
 
 We have a really big issue in our office and we need you to solve it. We are trying to practice Yoga, but we are not able to remember the different postures, and we need your superpowers as Full Stack to provide us a solution for it! 
 
+# Install dependencies
+
+It is possible to simply install dependencies and run it. Simply run the following commands from 
+the root directory (where is located requirements.txt file) to install dependencies:
+
+    python3 -m pip install -r requirements.txt
+    cd yoga
+    python3 manage.py makemigrations
+    python3 manage.py migrate --run-syncdb
+    
+And then run the HTTP server, exposing the API, running the following command
+
+    python3 manage.py runserver
+
+# Run all tests
+
+First, install dependencies (see prior section)
+Then, from the root directory (where is located manage.py file) run
+
+    python manage.py test
+
+# Run a single test
+
+From the root directory (where is located manage.py file) run
+
+    python manage.py test yoga.tests.<test_file_name>.<test_class_name>.<test_name>
+
+Example:
+
+    python manage.py test yoga.tests.tests_models.ModelsTestCase.test__new_posture__ok
+
+
 ## What we need? 
 
 Here you have the user stories we would need:
