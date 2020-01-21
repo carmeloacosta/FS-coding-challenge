@@ -16,6 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from .views.user import UserView
+from .views.default import handler404, handler500
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('user/add', UserView.as_view()),
+
 ]
+
+handler404 = handler404
+handler500 = handler500
