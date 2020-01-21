@@ -1,7 +1,7 @@
 
 import json
 from django.views import View
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 
 from ..controller import Controller
 

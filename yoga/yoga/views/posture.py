@@ -4,7 +4,7 @@ import json
 import time
 
 from django.views import View
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 
 from ..controller import Controller
 
@@ -67,18 +67,21 @@ class PostureView(View):
             result["now"] = body["now"]
 
         except json.decoder.JSONDecodeError:
-            message = "Bad Body. It must be a JSON"
+            message = {"error": "Bad Body. It must be a JSON"}
 
         except TypeError:
-            message = "Bad Body. Expected json with 'name', 'picture', 'description', and 'user' fields"
+            message = {"error": "Bad Body. Expected json with 'name', 'picture', 'description', and 'user' fields"}
 
         except ValueError:
-            message = "Bad Body. All input fields must be strings"
+            message = {"error": "Bad Body. All input fields must be strings"}
 
-        except KeyError:
-            # ASSUMPTION: ALL MANDATORY FIELDS CHECKED (CODE CHALLENGE SIMPLIFICATION)
-            # Optional "now" field not included
-            pass
+        except KeyError as e:
+            if len(e.args) == 1 and e.args[0] == "now":
+                # ASSUMPTION: ALL MANDATORY FIELDS CHECKED (CODE CHALLENGE SIMPLIFICATION)
+                # Optional "now" field not included
+                pass
+            else:
+                message = {"error": "Bad Body. Expected json with 'name', 'picture', 'description', and 'user' fields"}
 
         return result, message
 
@@ -115,8 +118,7 @@ class PostureView(View):
             Adds a new posture to the system.
 
         :param request: HTTP request
-        :return: HTTP response with the number of sunlight hours of the specified apartment (as specified in the Code
-            Challenge)
+        :return: HTTP response
         """
         result = False
         request_info, message = self.check_valid_body(request.body.decode())
@@ -141,7 +143,7 @@ class PostureView(View):
 
             else:
                 # Unknown user
-                message = "Unknown user"
+                message = {"error": "Unknown user"}
 
         else:
             # Bad parameters
@@ -152,4 +154,18 @@ class PostureView(View):
             if result:
                 return HttpResponse(message)
             else:
-                return HttpResponseBadRequest(message)
+                return HttpResponseBadRequest(json.dumps(message))
+
+    def get(self, request):
+        """
+            Retrieves all the postures in the system.
+
+        :param request: HTTP request
+        :return: HTTP response
+        """
+        controller = Controller()
+        result = controller.get_all_postures() #TODO: Very easy to get all postures info for a specific "user_name"
+
+        # Responsive response
+        if self.is_json_result(request):
+            return HttpResponse(json.dumps(result))

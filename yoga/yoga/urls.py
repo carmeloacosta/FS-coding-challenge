@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/add', UserView.as_view()),
     path('posture/add', PostureView.as_view()),
+    path('posture/get', PostureView.as_view()),
 ]
 
 handler404 = handler404

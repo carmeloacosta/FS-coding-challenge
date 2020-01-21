@@ -71,6 +71,10 @@ class Controller():
         """
             Returns all the
 
+            IMPLEMENTATION NOTE: I FOUND IT TRIVIAL TO ADD AN OPTIONAL PARAMETER TO USE THE SAME METHOD TO RETRIEVE
+            ONLY THE POSTURES ADDED BY A GIVEN USER. I ADD IT HERE JUST TO SHOW HOW IT WOULD LOOK LIKE. BESIDES, IN A
+            REAL IMPLEMENTATION I WOULD NOT ADD IT UNLESS REALLY NEEDED (AVOID OVERDESIGN)
+
         :param user_only: (str) If any user name is specified, returns only the postures that belongs to the specified
             user.
         :return: (list of dict) List of all postures. Each posture is represented by a dictionary involving all the
