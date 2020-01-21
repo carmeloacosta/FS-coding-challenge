@@ -1,7 +1,7 @@
 
 # Add logger
 import logging
-logger = logging.getLogger(__name__) #TODO: Replace logger with Dependency Injected global logger
+logger = logging.getLogger(__name__)
 
 from .models import User, Posture
 
@@ -46,6 +46,10 @@ class Controller():
         """
             Adds a new user to the system.
 
+            IMPLEMENTATION NOTE: HERE I WILL BE ASSUMING HAPPY PATH ALWAYS. IN A REAL IMPLEMENTATION WE SHOULD ALSO
+            HAVE TO HANDLE/CONSIDER ANY ERROR THAT COULD ARISE DUE TO DATA ERROR (I.E., TOO LONG DATA, INVALID TYPE,
+            ETC).
+
         :param user_info: (dict) Info of the user to be added. Follows the following format:
 
                 {
@@ -60,8 +64,8 @@ class Controller():
                     <email> : (str) Email address
                     <password> : (str) Password
 
-        :return: (bool) True if the user was properly added. If there is another user with the same name it returns
-            False, and the user is not added.
+        :return: (bool) True if the user was properly added. If either there is another user with the same name or
+            there is any user_info data error it returns False, and the user is not added.
         """
         result = False
         try:
@@ -79,5 +83,65 @@ class Controller():
 
             result = True
             self.logger.info("Added new user {}".format(user_info["name"]))
+
+        return result
+
+    def add_posture(self, posture_info, user_name):
+        """
+            Adds a new posture to the system.
+
+            IMPLEMENTATION NOTE: HERE I WILL BE ASSUMING HAPPY PATH ALWAYS. IN A REAL IMPLEMENTATION WE SHOULD ALSO
+            HAVE TO HANDLE/CONSIDER ANY ERROR THAT COULD ARISE DUE TO DATA ERROR (I.E., TOO LONG DATA, INVALID TYPE,
+            ETC).
+
+        :param posture_info: (dict) Info of the posture to be added. Follows the following format:
+
+                {
+                    "id": <id>,
+                    "name" : <user_name>,
+                    "picture": <email>,
+                    "description": <description>
+                }
+
+                with:
+
+                    <id> : (str) Unique 24-character-long hash that identifies the yoga posture
+                    <name> : (str) Name of the yoga posture
+                    <picture> : (str) Url of the picture that represents the yoga posture
+                    <description> : (str) Textual description of the yoga posture
+
+        :param user_name: (str) Name of the user that introduced the yoga posture. Must match with an already
+            registered user in the system.
+
+        :return: (bool) True if the user was properly added. If either there is another posture with the same id or
+            the specified user does not exists or there is any posture_info data error, it returns False, and the
+            posture is not added.
+        """
+        result = False
+        try:
+            posture = Posture.objects.get(id=posture_info["id"])
+            self.logger.debug("Trying to add already existent posture {}".format(posture.id))
+
+        except Posture.DoesNotExist:
+            # OK, it does not exists. Add it
+            try:
+                user = User.objects.get(name=user_name)
+                posture_info["user"] = user
+
+                new_posture = Posture(**posture_info)
+                new_posture.save()
+
+                del posture_info["user"]
+
+                result = True
+                self.logger.info("Added new posture {}".format(posture_info["id"]))
+
+            except User.DoesNotExist:
+                # Trying to add a posture for a non registered user
+                self.logger.error("Error while adding new posture: unknown user {}".format(user_name))
+
+        except KeyError:
+            # Bad input
+            self.logger.error("Error while adding new user: missing field 'id' in posture_info={}".format(posture_info))
 
         return result
