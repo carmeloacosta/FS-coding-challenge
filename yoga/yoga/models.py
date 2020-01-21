@@ -43,3 +43,13 @@ class Posture(models.Model):
 
         return "< id={}, name={}, picture={}, user={}, description={} >".format(self.id, self.name, self.picture,
                                                                        self.user.name, self.description[:20])
+
+    def to_dict(self):
+        """
+            Returns all the posture info.
+
+        :return: (dict) Posture info
+        """
+        result = {"id": self.id, "name": self.name, "picture": self.picture, "description": self.description,
+                  "user": self.user.name}
+        return result

@@ -8,6 +8,14 @@
     }
   },
   {
+    "model": "yoga.user",
+    "pk": "christianaranda",
+    "fields": {
+      "email": "christian.aranda@yogasolo.app",
+      "password": "christianaranda2020"
+    }
+  },
+  {
     "model": "yoga.posture",
     "pk": "5df111bd23f72ffeefe0fa2f",
     "fields": {
@@ -24,6 +32,16 @@
       "user": "albertmiro",
       "name": "Initial posture 2",
       "description": "Initial posture 2 description",
+      "picture": "https://loremflickr.com/320/320/yoga,asana"
+    }
+  },
+  {
+    "model": "yoga.posture",
+    "pk": "5df111bd23f72ffeefe0fa2e",
+    "fields": {
+      "user": "christianaranda",
+      "name": "Initial posture 3",
+      "description": "Initial posture 3 description",
       "picture": "https://loremflickr.com/320/320/yoga,asana"
     }
   }
