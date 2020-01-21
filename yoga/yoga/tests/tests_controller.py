@@ -175,3 +175,91 @@ class ControllerTestCase(TestCase):
 
             # Check results
             self.assertEqual(result, False)
+
+    def test__is_valid_user__ok(self):
+
+        user_list = ["albertmiro", "christianaranda"]
+
+        # Test main
+        for user_name in user_list:
+            result = self.controller.is_valid_user(user_name)
+
+            # Check results
+            self.assertEqual(result, True)
+
+    def test__is_valid_user__wrong(self):
+
+        user_list = ["carmeloacosta", "unknownuser"]
+
+        # Test main
+        for user_name in user_list:
+            result = self.controller.is_valid_user(user_name)
+
+            # Check results
+            self.assertEqual(result, False)
+
+    def test__create_posture_hash__ok(self):
+
+        # ((<posture_info>, <now>), <expected_hash>)
+        now = 1579611302
+        posture_info_list = [(({
+                "name": "Added posture 1",
+                "description": "Added posture 1 description",
+                "picture": "https://loremflickr.com/320/320/yoga,asana",
+                "user": self.user_name
+            }, now), "780c11aa9212e666a45d9d4a"),
+            (({
+                  "name": "Added posture 2",
+                  "description": "Added posture 1 description",
+                  "picture": "https://loremflickr.com/320/320/yoga,asana",
+                  "user": self.user_name
+              }, now), "419d59e5150da91b244d164a"),
+            (({
+                  "name": "Added posture 1",
+                  "description": "Added posture 1 description",
+                  "picture": "https://loremflickr.com/320/320/yoga,asana",
+                  "user": "christianaranda"
+              }, now), "e15c1d7734fa35e08ffe4871"),
+            (({
+                  "name": "Added posture 1",
+                  "description": "Added posture 1 description",
+                  "picture": "https://loremflickr.com/320/320/yoga,asana",
+                  "user": "christianaranda"
+              }, now + 10), "21f8369e60e80d3e3f5e1227"),
+        ]
+
+        # Test main
+        for posture_info in posture_info_list:
+            result = self.controller.create_posture_hash(posture_info[0][0], posture_info[0][1])
+
+            # Check results
+            self.assertEqual(result, posture_info[1])
+
+    def test__create_posture_hash__wrong(self):
+
+        # ((<posture_info>, <now>), <expected_hash>)
+        now = 1579611302
+        posture_info_list = [(({
+                "description": "Added posture 1 description",
+                "picture": "https://loremflickr.com/320/320/yoga,asana",
+                "user": self.user_name
+            }, now), "000000000000000000000000"),
+            (({
+                  "name": "Added posture 2",
+                  "description": "Added posture 1 description",
+                  "picture": "https://loremflickr.com/320/320/yoga,asana",
+              }, now), "000000000000000000000000"),
+            (({
+                  "name": "Added posture 1",
+                  "description": "Added posture 1 description",
+                  "picture": "https://loremflickr.com/320/320/yoga,asana",
+                  "user": "christianaranda"
+              }, "error!!!"), "000000000000000000000000")
+        ]
+
+        # Test main
+        for posture_info in posture_info_list:
+            result = self.controller.create_posture_hash(posture_info[0][0], posture_info[0][1])
+
+            # Check results
+            self.assertEqual(result, posture_info[1])

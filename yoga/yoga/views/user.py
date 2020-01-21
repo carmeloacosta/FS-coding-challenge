@@ -40,9 +40,9 @@ class UserView(View):
 
             with:
 
-                    <user_name> : (str) Neighbourhood name (case sensitive)
-                    <email> : (str) Building name (case sensitive)
-                    <password> : (int) Apartment number (from 0 to N-1, lower to higher floor respectively).
+                    <user_name> : (str) User name.
+                    <email> : (str) User email address.
+                    <password> : (int) User password.
 
         """
         result = None
@@ -104,6 +104,7 @@ class UserView(View):
             # Bad parameters
             pass
 
+        # Responsive response
         if self.is_json_result(request):
             if result:
                 return HttpResponse(message)

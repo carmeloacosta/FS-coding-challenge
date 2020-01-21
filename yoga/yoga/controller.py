@@ -1,4 +1,6 @@
 
+import hashlib
+
 # Add logger
 import logging
 logger = logging.getLogger(__name__)
@@ -17,6 +19,53 @@ class Controller():
     """
     def __init__(self, elogger=logger):
         self.logger = elogger
+
+    def create_posture_hash(self, posture_info, now):
+        """
+            Retrieves a unique hash for the specified posture.
+
+            IMPLEMENTATION NOTE: I ADD THIS CODE HERE SINCE THE TEST USES A HASH FOR THE POSTURE INDEX. SUCH A THING
+            WOULD REQUIRE A REASONING IN A REAL IMPLEMENTATION. FOR THIS TEST PURPOSES IT IS NOT REALLY NEEDED; A
+            SIMPLE AUTOINCREMENT WOULD BE ENOUGH.
+
+        :param posture_info: (dict) Info of the posture to be added. Follows the following format:
+
+                {
+                    "name": <posture_name>,
+                    "picture": <email>,
+                    "description": <description>
+                    "user": <user_name>,
+                }
+
+                with:
+
+                    <name> : (str) Name of the yoga posture
+                    <picture> : (str) Url of the picture that represents the yoga posture
+                    <description> : (str) Textual description of the yoga posture
+                    <user> : (str) User name that adds the posture
+
+        :param now: (int) UNIT Timestamp, as number of seconds elapsed since 0:00 January 1st 1970, to be used to
+            create unique hash.
+        :return: (str) Unique 24-character-long hash that identifies the yoga posture. Returns a zero padded string if
+            something went wrong.
+
+            Examples:
+
+                "5df111bd23f72ffeefe0fa2f"
+                "5df111bd23f72ffeefe0ffff"
+
+        """
+        result = "000000000000000000000000"
+        try:
+            m = hashlib.md5()
+            m.update(posture_info["name"].encode('utf-8'))
+            m.update(posture_info["user"].encode('utf-8'))
+            m.update(str(int(now)).encode('utf-8'))
+            result = m.hexdigest()[:24]
+        except (KeyError, ValueError, TypeError):
+            pass
+
+        return result
 
     def get_all_postures(self, user_only=None):
         """
@@ -39,6 +88,24 @@ class Controller():
             result.append(posture.to_dict())
 
         self.logger.debug("user_only: {}, result: {}".format(user_only, result))
+
+        return result
+
+    def is_valid_user(self, user_name):
+        """
+            Tells whether the specified user is already registered and, therefore, is valid.
+
+        :param user_name: (str) User name.
+        :return: (bool) True if the user is valid; False otherwise.
+        """
+        result = True
+        try:
+            user = User.objects.get(name=user_name)
+            self.logger.debug("Checking user is valid : {} -> True".format(user.name))
+
+        except User.DoesNotExist:
+            result = False
+            self.logger.debug("Checking user is valid : {} -> True".format(user_name))
 
         return result
 
@@ -128,10 +195,20 @@ class Controller():
                 user = User.objects.get(name=user_name)
                 posture_info["user"] = user
 
+                # Remove 'now' field since it does not has to do with Posture
+                try:
+                    now = posture_info["now"]
+                    del posture_info["now"]
+                except KeyError:
+                    now = None
+
                 new_posture = Posture(**posture_info)
                 new_posture.save()
 
-                del posture_info["user"]
+                # Restore posture_info (invariant output)
+                posture_info["user"] = posture_info["user"].name
+                if now is not None:
+                    posture_info["now"] = now
 
                 result = True
                 self.logger.info("Added new posture {}".format(posture_info["id"]))
