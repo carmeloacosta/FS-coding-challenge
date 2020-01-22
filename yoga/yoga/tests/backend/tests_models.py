@@ -4,8 +4,8 @@
 import os
 from django.test import TestCase
 
-from ..models import Posture, User
-from ..settings import FIXTURE_DIRS
+from ...models import Posture, User
+from ...settings import FIXTURE_DIRS
 
 
 class ModelsTestCase(TestCase):

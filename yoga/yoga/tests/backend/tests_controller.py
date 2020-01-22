@@ -5,9 +5,9 @@ import os
 from django.test import TestCase
 from unittest.mock import MagicMock
 
-from ..models import Posture, User
-from ..controller import Controller
-from ..settings import FIXTURE_DIRS
+from ...models import Posture, User
+from ...controller import Controller
+from ...settings import FIXTURE_DIRS
 
 
 class ControllerTestCase(TestCase):

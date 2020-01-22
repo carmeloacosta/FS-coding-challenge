@@ -1,11 +1,13 @@
 
 import hashlib
 
+
 # Add logger
 import logging
 logger = logging.getLogger(__name__)
 
 from .models import User, Posture
+from django.contrib.auth.models import User as AuthUser
 
 
 class Controller():
@@ -151,6 +153,9 @@ class Controller():
             # OK, it does not exists. Add it
             new_user = User(**user_info)
             new_user.save()
+
+            #TODO: Remove explicit User and replace with AuthUser (automatically handled by auth APP)
+            AuthUser.objects.create_user(user_info["name"], user_info["email"], user_info["password"])
 
             result = True
             self.logger.info("Added new user {}".format(user_info["name"]))

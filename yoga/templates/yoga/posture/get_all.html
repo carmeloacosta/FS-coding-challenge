@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YOGA SOLO CODE CHALLENGE</title>
+    {% load static %}
+        <link rel="stylesheet" href="{% static 'yoga/css/style.css' %}" type="text/css" media="screen" >
+</head>
+<body>
+  <div id="header" align="right" >
+      {% if session_user %}
+        <h3>{{ session_user }}</h3><h3><a href="{% url 'login' %}"> |  LOGOUT</a></h3>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>
+      {% endif %}
+  </div>
+  <div id="content">
+    {% if posture_list %}
+        <table class="blueTable">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Picture</th>
+                    <th>User</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                    <div class="links"><a href="{% url 'posture_add' %}">Add</a></div>
+                    </td>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% for posture in posture_list %}
+                <tr>
+                    <td>{{ posture.id }}</td>
+                    <td>{{ posture.name }}</td>
+                    <td>{{ posture.user }}</td>
+                    <td><a href={{ posture.picture }}>Photo</a></td>
+                    <td>{{ posture.description }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No postures available.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
+
+
+
+

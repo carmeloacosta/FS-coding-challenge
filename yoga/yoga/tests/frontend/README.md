@@ -1,0 +1,1 @@
+This folder should contain tests that checked the frontend.

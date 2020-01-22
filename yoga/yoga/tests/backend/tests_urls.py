@@ -5,7 +5,7 @@ import os
 from json import dumps
 from django.test import TestCase
 
-from ..settings import FIXTURE_DIRS
+from ...settings import FIXTURE_DIRS
 
 
 class UserViewTestCase(TestCase):
@@ -31,6 +31,10 @@ class UserViewTestCase(TestCase):
         # Check results
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), "Added new user")
+
+    def test__user_add_html__ok(self):
+        # TODO: Use Selenium to access the backend from the browser
+        pass
 
 
 class PostureViewTestCase(TestCase):
@@ -81,6 +85,10 @@ class PostureViewTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content.decode(), dumps({"id": posture_info[1]}))
 
+    def test__posture_add_html__ok(self):
+        # TODO: Use Selenium to access the backend from the browser
+        pass
+
     def test__posture_add_json__wrong(self):
         # ((<posture_info>, <now>), <expected_hash>)
         now = 1579611302
@@ -113,10 +121,23 @@ class PostureViewTestCase(TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.content.decode(), dumps(posture_info[1]))
 
+    def test__posture_add_html__wrong(self):
+        # TODO: Use Selenium to access the backend from the browser
+        pass
+
+
+class PostureListViewTestCase(TestCase):
+
+    maxDiff = None
+    fixtures = [os.path.join(FIXTURE_DIRS[0], 'initial_state.json'), ]
+
+    def setUp(self):
+        pass
+
     def test__posture_get_json__ok(self):
 
         # Test main
-        response = self.client.get('/posture/get?json=true')
+        response = self.client.get('/posture/get_all?json=true')
 
         # Check results
         expected_postures = [
@@ -139,4 +160,6 @@ class PostureViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), dumps(expected_postures))
 
-
+    def test__posture_get_html__ok(self):
+        # TODO: Use Selenium to access the backend from the browser
+        pass

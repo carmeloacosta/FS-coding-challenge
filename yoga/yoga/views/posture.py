@@ -4,8 +4,12 @@ import json
 import time
 
 from django.views import View
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.urls import reverse
+from django.utils.datastructures import MultiValueDictKeyError
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.template import loader
 
+from ..forms import PostureForm
 from ..controller import Controller
 
 # For the sake of simplicity, in this test I will deactivate the CSRF protection for this test. In real production
@@ -93,8 +97,12 @@ class PostureView(View):
         :param request: HTTP request
         :return: (bool) True if JSON result expected; False otherwise.
         """
-        json_result = request.GET['json']
-        result = bool(json_result)
+        try:
+            json_result = request.GET['json']
+            result = bool(json_result)
+        except MultiValueDictKeyError:
+            result = False
+
         return result
 
     @staticmethod
@@ -120,52 +128,85 @@ class PostureView(View):
         :param request: HTTP request
         :return: HTTP response
         """
-        result = False
-        request_info, message = self.check_valid_body(request.body.decode())
+        if self.is_json_result(request):
+            #
+            # JSON API MANAGEMENT
+            #
+            result = False
+            request_info, message = self.check_valid_body(request.body.decode())
 
-        if request_info:
-            controller = Controller()
-            if controller.is_valid_user(request_info["user"]):
-                # Get hash time
-                now = self.get_time(request_info)
+            if request_info:
+                controller = Controller()
+                if controller.is_valid_user(request_info["user"]):
+                    # Get hash time
+                    now = self.get_time(request_info)
 
-                # Create a unique hash for the new posture
-                request_info["id"] = controller.create_posture_hash(request_info, now)
-                new_posture = controller.add_posture(request_info, request_info["user"])
+                    # Create a unique hash for the new posture
+                    request_info["id"] = controller.create_posture_hash(request_info, now)
+                    new_posture = controller.add_posture(request_info, request_info["user"])
 
-                if new_posture:
-                    # New user created
-                    result = True
-                    message = json.dumps({"id": request_info["id"]})
+                    if new_posture:
+                        # New user created
+                        result = True
+                        message = json.dumps({"id": request_info["id"]})
+                    else:
+                        # Could not create new posture
+                        pass
+
                 else:
-                    # Could not create new posture
-                    pass
+                    # Unknown user
+                    message = {"error": "Unknown user"}
 
             else:
-                # Unknown user
-                message = {"error": "Unknown user"}
+                # Bad parameters
+                pass
 
-        else:
-            # Bad parameters
-            pass
-
-        # Responsive response
-        if self.is_json_result(request):
             if result:
                 return HttpResponse(message)
             else:
                 return HttpResponseBadRequest(json.dumps(message))
 
+        else:
+            #
+            # HTML TEMPLATE VIEW
+            #
+
+            # Create a form instance and populate it with data from the request:
+            form = PostureForm(request.POST)
+
+            # check whether it's valid:
+            if form.is_valid():
+                # Create the new posture
+                request_info = form.cleaned_data
+
+                # Get hash time
+                now = self.get_time(request_info)
+
+                controller = Controller()
+
+                # Create a unique hash for the new posture
+                request_info["user"] = request.user.username
+                request_info["id"] = controller.create_posture_hash(request_info, now)
+
+                # Add the new posture
+                controller.add_posture(request_info, request.user.username)
+
+                # redirect to a new URL
+                return HttpResponseRedirect(reverse('posture_get_all'))
+
     def get(self, request):
         """
-            Retrieves all the postures in the system.
+            Allows to Add/Edit a single posture.
 
         :param request: HTTP request
         :return: HTTP response
         """
-        controller = Controller()
-        result = controller.get_all_postures() #TODO: Very easy to get all postures info for a specific "user_name"
-
         # Responsive response
-        if self.is_json_result(request):
-            return HttpResponse(json.dumps(result))
+        if not self.is_json_result(request):
+            # HTML TEMPLATE VIEW
+            form = PostureForm()
+            template = loader.get_template('yoga/posture/add.html')
+            context = {
+                'form': form,
+            }
+            return HttpResponse(template.render(context, request))

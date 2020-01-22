@@ -14,18 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from .views.user import UserView
 from .views.posture import PostureView
+from .views.posture_list import PostureListView
 from .views.default import handler404, handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/add', UserView.as_view()),
-    path('posture/add', PostureView.as_view()),
-    path('posture/get', PostureView.as_view()),
+    path('user/add', UserView.as_view(), name="user_add"),
+    path('posture/add', PostureView.as_view(), name="posture_add"),
+    path('posture/get', PostureView.as_view(), name="posture_get"),
+    path('posture/get_all', PostureListView.as_view(), name="posture_get_all"),
+    path('accounts/', include('django.contrib.auth.urls'), name="login"),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
 
 handler404 = handler404
 handler500 = handler500

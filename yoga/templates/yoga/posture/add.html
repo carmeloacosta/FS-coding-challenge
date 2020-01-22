@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YOGA SOLO CODE CHALLENGE</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'yoga/css/style.css' %}" type="text/css" media="screen" >
+</head>
+<body>
+    <form action="{% url 'posture_add' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+
+
