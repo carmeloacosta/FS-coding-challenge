@@ -9,7 +9,7 @@
 <body>
   <div id="header" align="right" >
       {% if session_user %}
-        <h3>{{ session_user }}</h3><h3><a href="{% url 'login' %}"> |  LOGOUT</a></h3>
+        <h3>{{ session_user }}</h3><h3><a href="{% url 'logout' %}"> |  LOGOUT</a></h3>
       {% else %}
         <a href="{% url 'login' %}">Login</a>
       {% endif %}

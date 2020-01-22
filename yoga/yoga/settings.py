@@ -151,3 +151,4 @@ LOGGING = {
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/posture/get_all'
+LOGOUT_REDIRECT_URL = '/accounts/login'

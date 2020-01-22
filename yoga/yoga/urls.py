@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
+from django.contrib.auth.views import LogoutView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from .settings import LOGOUT_REDIRECT_URL
 from .views.user import UserView
 from .views.posture import PostureView
 from .views.posture_list import PostureListView
@@ -31,6 +33,7 @@ urlpatterns = [
     path('posture/get', PostureView.as_view(), name="posture_get"),
     path('posture/get_all', PostureListView.as_view(), name="posture_get_all"),
     path('accounts/', include('django.contrib.auth.urls'), name="login"),
+    path('logout/', LogoutView.as_view(), {'next_page': LOGOUT_REDIRECT_URL}, name='logout'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
