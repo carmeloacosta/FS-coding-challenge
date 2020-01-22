@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from .views.user import UserView
@@ -24,6 +25,7 @@ from .views.default import handler404, handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(url='accounts/login'), name="home"),
     path('user/add', UserView.as_view(), name="user_add"),
     path('posture/add', PostureView.as_view(), name="posture_add"),
     path('posture/get', PostureView.as_view(), name="posture_get"),
